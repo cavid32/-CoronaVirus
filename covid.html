@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Covid-19 Verileri</title>
+  </head>
+  <body>
+    <input type="text" id="filterInput" placeholder="Ülke adıyla filtrele..." />
+    <table border="1" id="covidTable"></table>
+    <script>
+      fetch("https://api.covid19api.com/summary")
+        .then((response) => response.json())
+        .then((data) => {
+          let table = document.createElement("table");
+          let thead = document.createElement("thead");
+          let tbody = document.createElement("tbody");
+          let tr = document.createElement("tr");
+          let th1 = document.createElement("th");
+          let th2 = document.createElement("th");
+          let th3 = document.createElement("th");
+          let th4 = document.createElement("th");
+
+          th1.innerHTML = "Ölkə";
+          th2.innerHTML = "Ümumi yoluxma";
+          th3.innerHTML = "Ümumi ölüm";
+          th4.innerHTML = "Ümumi sağalan";
+
+          tr.appendChild(th1);
+          tr.appendChild(th2);
+          tr.appendChild(th3);
+          tr.appendChild(th4);
+          thead.appendChild(tr);
+          table.appendChild(thead);
+
+          for (let i = 0; i < data.Countries.length; i++) {
+            let tr = document.createElement("tr");
+            let td1 = document.createElement("td");
+            let td2 = document.createElement("td");
+            let td3 = document.createElement("td");
+            let td4 = document.createElement("td");
+
+            td1.innerHTML = data.Countries[i].Country;
+            td2.innerHTML = data.Countries[i].TotalConfirmed;
+            td3.innerHTML = data.Countries[i].TotalDeaths;
+            td4.innerHTML = data.Countries[i].TotalRecovered;
+
+            tr.appendChild(td1);
+            tr.appendChild(td2);
+            tr.appendChild(td3);
+            tr.appendChild(td4);
+            tbody.appendChild(tr);
+          }
+
+          table.appendChild(tbody);
+          document.body.appendChild(table);
+          var filterInput = document.getElementById("filterInput");
+          filterInput.addEventListener("keyup", function () {
+            var filterValue = filterInput.value.toUpperCase();
+            var rows = table.getElementsByTagName("tr");
+            for (var i = 1; i < rows.length; i++) {
+              var cells = rows[i].getElementsByTagName("td");
+              var country = cells[0].innerHTML.toUpperCase();
+              if (country.indexOf(filterValue) > -1) {
+                rows[i].style.display = "";
+              } else {
+                rows[i].style.display = "none";
+              }
+            }
+          });
+
+          fetch("https://coronavirus-19-api.herokuapp.com/countries")
+            .then(function (response) {
+              return response.json();
+            })
+            .then(function (data) {
+              createTable(data);
+            });
+        })
+        .catch((error) => console.error(error));
+    </script>
+  </body>
+</html>
